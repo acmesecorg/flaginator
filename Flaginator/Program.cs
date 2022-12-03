@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using System.IO;
+using static System.Net.WebRequestMethods;
 
 
 namespace Flaginator
@@ -24,47 +25,112 @@ namespace Flaginator
             foreach (var path in options.FilePaths)
             {
                 var mergedPath = Path.Combine(currentDirectory, path);
-                if (!File.Exists(mergedPath))
+                if (!System.IO.File.Exists(mergedPath))
                 {
                     ConsoleUtil.WriteError($"File {mergedPath} not found");
                     return;
                 }
             }
 
-            //Define a hashset to store past combinations
-            var hashset = new HashSet<int>();
+            //We want to combine all unique combinations now
+            //ie file1 + file 2 + file 3
+            //file1 + file3
+            //file1
+            //file3 + file1
+            //But not when using the same file multiple times
+            var pathSet = new HashSet<int>();
             var paths = options.FilePaths.ToList();
+            var files = new List<List<string>>();
 
-            //Loop through each file and progressively output a line if it isnt found
-            MergeFilePaths(hashset, paths, 0, "");
-        }
+            //Build all unique combinations of files 
+            AddPath(pathSet, paths, files, new List<string>(), 0);
 
-        public static void MergeFilePaths(HashSet<int> hashset, List<string> paths, int index, string parent)
-        {
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var mergedPath = Path.Combine(currentDirectory, paths[index]);
-
-            //First pass, write out line
-            using (var reader = new StreamReader(mergedPath))
+            //Display all file paths if debug is enabled
+            if (options.Debug)
             {
-                while (!reader.EndOfStream)
+                Console.Out.WriteLine("Combining the following files:");
+                foreach (var fileList in files)
                 {
-                    var line = $"{parent}{reader.ReadLine()}";
-                    var hash = line.GetHashCode();
-
-                    //If it was added to the hashset, then it should be outputted
-                    if (hashset.Add(hash)) Console.Out.WriteLine(line);
+                    Console.Out.WriteLine(string.Join(' ', fileList));
                 }
             }
 
-            if (index == paths.Count -1) return;
+            //Define a hashset to store past word combinations
+            var hashset = new HashSet<int>();
 
-            //Second pass, iterate
+            //Loop through each file and progressively output a line if it isnt found
+            foreach (var fileList in files)
+            {
+                MergeFilePaths(hashset, fileList, 0, new List<string>());
+            }
+        }
+
+        public static void AddPath(HashSet<int> hashset, List<string> paths, List<List<string>> files, List<string> parents, int index)
+        {
+            foreach (var path in paths)
+            {
+                var hashPaths = $"{string.Concat(parents)}{path}";
+                var hash = hashPaths.GetHashCode();
+
+                if (hashset.Add(hash))
+                {
+                    var newParents = new List<string>(parents);
+                    newParents.Add(path);
+                    files.Add(newParents);
+
+                    if (index < paths.Count - 1)
+                    {
+                        AddPath(hashset, paths, files, newParents, index + 1);
+                    }
+                }
+            }
+        }
+
+        public static void MergeFilePaths(HashSet<int> hashset, List<string> paths, int index, List<string> parents)
+        {
+            var currentDirectory = Directory.GetCurrentDirectory();
+            var mergedPath = Path.Combine(currentDirectory, paths[index]);
+            var isFinal = (index == paths.Count - 1);
+
+            //First pass, write out lines
             using (var reader = new StreamReader(mergedPath))
             {
                 while (!reader.EndOfStream)
                 {
-                    MergeFilePaths(hashset, paths, index + 1, $"{parent}{reader.ReadLine()}");
+                    var word = reader.ReadLine();
+                    var flag = false;
+
+                    if (word == null) continue;
+
+                    //Check the word isnt in any opf the parents
+                    foreach (var parent in parents)
+                    {
+                        if (parent == word)
+                        {
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    if (flag) continue;
+
+                    //Write out phrase, or iterate
+                    if (isFinal)
+                    {
+                        var final = $"{string.Concat(parents)}{word}";
+
+                        //Check for duplicates
+                        var hash = final.GetHashCode();
+                        if (hashset.Add(hash)) Console.Out.WriteLine(final);
+                    }
+                    else
+                    {
+                        parents.Add(word);
+                        MergeFilePaths(hashset, paths, index + 1, parents);
+
+                        //Remove last word
+                        parents.RemoveAt(parents.Count - 1);
+                    }
                 }
             }
         }
