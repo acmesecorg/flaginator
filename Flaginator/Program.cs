@@ -13,6 +13,12 @@ namespace Flaginator
             var parsed = Parser.Default.ParseArguments<FlagOptions>(args);
             var options = parsed.Value;
 
+            if (parsed.Tag == ParserResultType.NotParsed)
+            {
+                ConsoleUtil.WriteError("One or more arguments were invalid");
+                return;
+            }
+
             //Validate the file paths
             if (options.FilePaths.Count() == 0)
             {
