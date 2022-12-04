@@ -38,6 +38,41 @@ namespace Flaginator
                 }
             }
 
+            //Check rules exist
+            var rulePaths = new List<string>();
+
+            //Validate each path
+            foreach (var path in options.RulePaths)
+            {
+                if (path.ToLower() == "null")
+                {
+                    rulePaths.Add("null");
+                    continue;
+                }
+
+                var mergedPath = Path.Combine(currentDirectory, path);
+                if (!System.IO.File.Exists(mergedPath))
+                {
+                    ConsoleUtil.WriteError($"Rule {mergedPath} not found");
+                    return;
+                }
+                rulePaths.Add(mergedPath);
+            }
+
+            //Process rules
+            var rules = new List<List<List<string>>>();
+            foreach (var rulePath in rulePaths)
+            {
+                if (rulePath == "null")
+                {
+                    rules.Add(null);
+                    continue;
+                }
+
+                var lines = System.IO.File.ReadAllLines(rulePath);
+                rules.Add(RulesEngine.ProcessRules(lines));
+            }
+
             //We want to combine all unique combinations now
             //ie file1 + file 2 + file 3
             //file1 + file3

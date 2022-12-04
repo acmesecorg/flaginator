@@ -15,5 +15,8 @@ namespace Flaginator
 
         [Option("max", Default = 1024, HelpText = "Set maximum line length")]
         public int MaximumLength { get; set; }
+
+        [Option('r', "rules", HelpText = "Rules to apply to each combination.")]
+        public IEnumerable<string> RulePaths { get; set; }
     }
 }
