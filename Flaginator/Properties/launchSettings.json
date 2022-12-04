@@ -2,7 +2,7 @@
   "profiles": {
     "Flaginator": {
       "commandName": "Project",
-      "commandLineArgs": "file1.txt file1.txt"
+      "commandLineArgs": "file1.txt file1.txt --min 4 --max 7"
     }
   }
 }

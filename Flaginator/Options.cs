@@ -9,5 +9,11 @@ namespace Flaginator
 
         [Option(Default = false, HelpText = "Display additional debug information")]
         public Boolean Debug { get; set; }
+
+        [Option("min", Default = 0, HelpText = "Set minimum line length")]
+        public int MinimumLength { get; set; }
+
+        [Option("max", Default = 1024, HelpText = "Set maximum line length")]
+        public int MaximumLength { get; set; }
     }
 }

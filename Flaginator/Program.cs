@@ -67,7 +67,7 @@ namespace Flaginator
             //Loop through each file and progressively output a line if it isnt found
             foreach (var fileList in files)
             {
-                MergeFilePaths(hashset, fileList, 0, new List<string>());
+                MergeFilePaths(hashset, fileList, 0, new List<string>(), options);
             }
         }
 
@@ -92,7 +92,7 @@ namespace Flaginator
             }
         }
 
-        public static void MergeFilePaths(HashSet<int> hashset, List<string> paths, int index, List<string> parents)
+        public static void MergeFilePaths(HashSet<int> hashset, List<string> paths, int index, List<string> parents, FlagOptions options)
         {
             var currentDirectory = Directory.GetCurrentDirectory();
             var mergedPath = Path.Combine(currentDirectory, paths[index]);
@@ -127,12 +127,18 @@ namespace Flaginator
 
                         //Check for duplicates
                         var hash = final.GetHashCode();
-                        if (hashset.Add(hash)) Console.Out.WriteLine(final);
+                        if (hashset.Add(hash))
+                        {
+                            if (final.Length >= options.MinimumLength && final.Length <= options.MaximumLength)
+                            {
+                                Console.Out.WriteLine(final);
+                            }
+                        }
                     }
                     else
                     {
                         parents.Add(word);
-                        MergeFilePaths(hashset, paths, index + 1, parents);
+                        MergeFilePaths(hashset, paths, index + 1, parents, options);
 
                         //Remove last word
                         parents.RemoveAt(parents.Count - 1);
