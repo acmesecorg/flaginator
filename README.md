@@ -17,4 +17,4 @@ Flaginator is licensed under the MIT license. Refer to [license.txt](https://git
   
 ## Usage
 
-`flaginator file1.txt file1.txt file2.txt`
+`flaginator file1.txt file1.txt file2.txt > output.txt`
