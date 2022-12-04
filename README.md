@@ -12,8 +12,8 @@ Flaginator is licensed under the MIT license. Refer to [license.txt](https://git
 
 | Platform | Link |
 | --- | --- |
-| win-x64 | [flaginator-win-x64-0.1.0.7z](https://github.com/acmesecorg/flaginator/blob/main/Builds/flaginator-win-x64-0.1.0.7z)|
-| linux-x64 | [flaginator-linux-x64-0.1.0.7z](https://github.com/acmesecorg/flaginator/blob/main/Builds/flaginator-linux-64-0.1.0.7z)|
+| win-x64 | [flaginator-win-x64-0.1.0.7z](https://github.com/acmesecorg/flaginator/raw/main/Builds/flaginator-win-x64-0.1.0.7z)|
+| linux-x64 | [flaginator-linux-x64-0.1.0.7z](https://github.com/acmesecorg/flaginator/raw/main/Builds/flaginator-linux-64-0.1.0.7z)|
   
 ## Usage
 
